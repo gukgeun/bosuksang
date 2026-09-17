@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# staging folder for raw art files dropped in by hand (not part of the app)
+/incoming-assets
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
