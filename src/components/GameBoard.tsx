@@ -89,7 +89,7 @@ export function GameBoard({
       >
         <div style={{ gridArea: "tokens", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "#e8c874" }}>토큰</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
             {TOKEN_COLORS.map((color) => (
               <div
                 key={color}

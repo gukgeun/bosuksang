@@ -56,8 +56,8 @@ export function CardView({ card, variant = "modal" }: { card: Card; variant?: "b
         <div
           style={{
             position: "absolute",
-            top: "2%",
-            right: "5%",
+            top: "7%",
+            right: "9%",
             fontFamily: "sans-serif",
             fontWeight: 700,
             fontSize: pointsFontSize,

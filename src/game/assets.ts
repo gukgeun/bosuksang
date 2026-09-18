@@ -11,7 +11,7 @@ export const TIER_BORDER_COLOR: Record<Tier, string> = {
   3: "#2563eb", // blue
 };
 
-const ASSET_EXT = "png";
+const ASSET_EXT = "webp";
 
 export function cardFrameSrc(card: Card): string {
   const count = TIER_FRAME_COUNT[card.tier];
