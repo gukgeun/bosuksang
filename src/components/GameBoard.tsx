@@ -84,12 +84,12 @@ export function GameBoard({
           gridTemplateColumns: "1fr clamp(96px, 10vw, 132px)",
           gridTemplateRows: "auto 1fr auto",
           gridTemplateAreas: '"tokens nobles" "cards nobles" "players players"',
-          gap: 6,
+          gap: 4,
         }}
       >
         <div style={{ gridArea: "tokens", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "#e8c874" }}>토큰</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             {TOKEN_COLORS.map((color) => (
               <div
                 key={color}
@@ -118,7 +118,7 @@ export function GameBoard({
                 </span>
               </div>
             ))}
-            <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+            <div style={{ display: "flex", gap: 6 }}>
               <button
                 className="card-action-btn"
                 disabled={!canAct || selectedColors.length !== 3}
@@ -141,10 +141,7 @@ export function GameBoard({
 
         <div style={{ gridArea: "cards", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
           {TIERS.map((tier) => (
-            <div key={tier} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 2 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#e8c874" }}>
-                TIER {tier} · 덱 {state.decks[tier].length}장
-              </span>
+            <div key={tier} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
               <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 10, alignItems: "stretch", justifyContent: "center" }}>
                 {state.visibleCards[tier].map((card, slotIndex) => {
                   if (!card) return <div key={slotIndex} style={{ height: "100%", aspectRatio: "5 / 7" }} />;
