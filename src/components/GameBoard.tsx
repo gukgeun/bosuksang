@@ -30,6 +30,7 @@ export function GameBoard({
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [openPlayerSeat, setOpenPlayerSeat] = useState<number | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ tier: Tier; slotIndex: number } | null>(null);
 
   const me = state.players[mySeatIndex];
   const isMyTurn = state.currentPlayerIndex === mySeatIndex;
@@ -42,6 +43,7 @@ export function GameBoard({
       await onAction(action);
       setSelectedColors([]);
       setDiscardPlan({});
+      setSelectedSlot(null);
     } catch (e) {
       setLocalError(e instanceof Error ? e.message : "행동을 처리할 수 없습니다.");
     } finally {
@@ -79,7 +81,7 @@ export function GameBoard({
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "1fr clamp(90px, 10vw, 130px)",
+          gridTemplateColumns: "1fr clamp(96px, 10vw, 132px)",
           gridTemplateRows: "auto 1fr auto",
           gridTemplateAreas: '"tokens nobles" "cards nobles" "players players"',
           gap: 6,
@@ -99,7 +101,7 @@ export function GameBoard({
                   outline: selectedColors.includes(color as GemColor) ? "3px solid #ca8a04" : "none",
                 }}
               >
-                <TokenIcon color={color} size={34} />
+                <TokenIcon color={color} size={40} />
                 <span
                   style={{
                     position: "absolute",
@@ -143,42 +145,73 @@ export function GameBoard({
               <span style={{ fontSize: 10, fontWeight: 700, color: "#e8c874" }}>
                 TIER {tier} · 덱 {state.decks[tier].length}장
               </span>
-              <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 8, alignItems: "stretch", justifyContent: "center" }}>
-                {state.visibleCards[tier].map((card, slotIndex) =>
-                  card ? (
+              <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 10, alignItems: "stretch", justifyContent: "center" }}>
+                {state.visibleCards[tier].map((card, slotIndex) => {
+                  if (!card) return <div key={slotIndex} style={{ height: "100%", aspectRatio: "5 / 7" }} />;
+
+                  const isSelected = selectedSlot?.tier === tier && selectedSlot.slotIndex === slotIndex;
+
+                  return (
                     <div
                       key={card.id}
-                      style={{ height: "100%", display: "flex", flexDirection: "column", gap: 2, minHeight: 0 }}
+                      onClick={() => setSelectedSlot(isSelected ? null : { tier, slotIndex })}
+                      style={{ height: "100%", position: "relative", cursor: "pointer" }}
                     >
-                      <div style={{ flex: 1, minHeight: 0 }}>
-                        <CardView card={card} variant="board" />
-                      </div>
-                      <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
-                        <button
-                          className="card-action-btn"
-                          disabled={!canAct || !me || !canAffordCard(me, card)}
-                          onClick={() => dispatch({ type: "PURCHASE_VISIBLE", tier, slotIndex })}
+                      <CardView card={card} variant="board" />
+                      {isSelected && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            borderRadius: 8,
+                            background: "rgba(20, 12, 6, 0.75)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "stretch",
+                            justifyContent: "center",
+                            gap: "6%",
+                            padding: "8%",
+                          }}
                         >
-                          구매
-                        </button>
-                        <button
-                          className="card-action-btn"
-                          disabled={!canAct || (me?.reservedCards.length ?? 0) >= 3}
-                          onClick={() => dispatch({ type: "RESERVE_VISIBLE", tier, slotIndex })}
-                        >
-                          예약
-                        </button>
-                      </div>
+                          <button
+                            className="card-action-btn"
+                            disabled={!canAct || !me || !canAffordCard(me, card)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dispatch({ type: "PURCHASE_VISIBLE", tier, slotIndex });
+                            }}
+                          >
+                            구매
+                          </button>
+                          <button
+                            className="card-action-btn"
+                            disabled={!canAct || (me?.reservedCards.length ?? 0) >= 3}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dispatch({ type: "RESERVE_VISIBLE", tier, slotIndex });
+                            }}
+                          >
+                            예약
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div key={slotIndex} style={{ height: "100%", aspectRatio: "5 / 7" }} />
-                  ),
-                )}
+                  );
+                })}
                 <button
-                  className="card-action-btn"
+                  className="card-action-btn deck-reserve-tile"
                   disabled={!canAct || state.decks[tier].length === 0 || (me?.reservedCards.length ?? 0) >= 3}
                   onClick={() => dispatch({ type: "RESERVE_FROM_DECK", tier })}
-                  style={{ flexShrink: 0, alignSelf: "center" }}
+                  style={{
+                    height: "100%",
+                    aspectRatio: "5 / 7",
+                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1.3,
+                  }}
                 >
                   덱에서
                   <br />

@@ -4,7 +4,7 @@
   --accent: #d4a441;
   --card-w: clamp(84px, 11vw, 140px);
   --card-h: calc(var(--card-w) * 1.4);
-  --noble-w: clamp(56px, 7vw, 84px);
+  --noble-w: clamp(64px, 8vw, 100px);
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -105,6 +105,20 @@ button.card-action-btn:disabled {
   background: #a89a86;
   color: #5c5245;
   border-color: #8a7c68;
+}
+
+button.deck-reserve-tile {
+  background: linear-gradient(160deg, #6b4a2c 0%, #4f3419 100%);
+  border: 2px dashed rgba(232, 200, 116, 0.55);
+  color: #f1e6d3;
+  min-height: 0;
+  padding: 4px;
+}
+
+button.deck-reserve-tile:disabled {
+  background: linear-gradient(160deg, #5a5044 0%, #453d33 100%);
+  border-color: rgba(232, 200, 116, 0.25);
+  color: #9c9284;
 }
 
 button.stepper-btn {

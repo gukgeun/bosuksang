@@ -9,10 +9,10 @@ export function CardView({ card, variant = "modal" }: { card: Card; variant?: "b
   );
 
   const isBoard = variant === "board";
-  const bonusIconSize = isBoard ? 18 : 22;
-  const costIconSize = isBoard ? 16 : 20;
-  const pointsFontSize = isBoard ? 17 : 20;
-  const costFontSize = isBoard ? 10 : 11;
+  const bonusIconSize = isBoard ? 20 : 22;
+  const costIconSize = isBoard ? 18 : 20;
+  const pointsFontSize = isBoard ? 19 : 20;
+  const costFontSize = isBoard ? 11 : 11;
 
   return (
     <div
