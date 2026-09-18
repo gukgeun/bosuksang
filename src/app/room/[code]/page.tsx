@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameBoard } from "@/components/GameBoard";
 import { ensureSignedIn, startGame, submitAction, subscribeRoom, type RoomDoc } from "@/lib/room";
-import type { Action } from "@/game/types";
+import { applyAction } from "@/game/engine";
+import type { Action, GameState } from "@/game/types";
 
 export default function RoomPage() {
   const params = useParams<{ code: string }>();
@@ -13,6 +14,7 @@ export default function RoomPage() {
 
   const [uid, setUid] = useState<string | null>(null);
   const [room, setRoom] = useState<RoomDoc | null | undefined>(undefined);
+  const [optimisticState, setOptimisticState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
 
@@ -24,7 +26,10 @@ export default function RoomPage() {
 
   useEffect(() => {
     if (!code) return;
-    const unsubscribe = subscribeRoom(code, setRoom);
+    const unsubscribe = subscribeRoom(code, (r) => {
+      setRoom(r);
+      setOptimisticState(null); // fresh server state always supersedes a local prediction
+    });
     return unsubscribe;
   }, [code]);
 
@@ -57,7 +62,18 @@ export default function RoomPage() {
   }
 
   async function handleAction(action: Action) {
-    await submitAction(code, action);
+    const base = optimisticState ?? room?.gameState;
+    if (base) {
+      // Predict the result locally so the board reacts instantly; the real
+      // Firestore write below reconciles (or corrects) it in the background.
+      setOptimisticState(applyAction(base, action));
+    }
+    try {
+      await submitAction(code, action);
+    } catch (e) {
+      setOptimisticState(null); // roll back the prediction; show the real server state + error
+      throw e;
+    }
   }
 
   return (
@@ -110,7 +126,7 @@ export default function RoomPage() {
 
       {me && inGame && room.gameState && (
         <div style={{ flex: 1, minHeight: 0, padding: 8 }}>
-          <GameBoard state={room.gameState} mySeatIndex={me.seatIndex} onAction={handleAction} />
+          <GameBoard state={optimisticState ?? room.gameState} mySeatIndex={me.seatIndex} onAction={handleAction} />
         </div>
       )}
     </main>
