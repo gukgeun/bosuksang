@@ -186,5 +186,5 @@ button.stepper-btn {
   box-shadow:
     inset 0 0 60px rgba(0, 0, 0, 0.4),
     0 10px 28px rgba(0, 0, 0, 0.55);
-  padding: clamp(8px, 1.6vw, 22px);
+  padding: clamp(6px, 1.2vw, 16px);
 }

@@ -66,8 +66,8 @@ export function GameBoard({
     .join(", ");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, gap: 6 }}>
-      <div style={{ flexShrink: 0, fontWeight: 700, fontSize: 14, textAlign: "center" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, gap: 4 }}>
+      <div style={{ flexShrink: 0, fontWeight: 700, fontSize: 13, textAlign: "center" }}>
         {isMyTurn ? "당신의 차례입니다!" : `${state.players[state.currentPlayerIndex].name}님의 차례`}
       </div>
 
@@ -82,12 +82,12 @@ export function GameBoard({
           gridTemplateColumns: "1fr clamp(90px, 10vw, 130px)",
           gridTemplateRows: "auto 1fr auto",
           gridTemplateAreas: '"tokens nobles" "cards nobles" "players players"',
-          gap: 8,
+          gap: 6,
         }}
       >
-        <div style={{ gridArea: "tokens", display: "flex", flexDirection: "column", gap: 6, minHeight: 0 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#e8c874" }}>토큰</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ gridArea: "tokens", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#e8c874" }}>토큰</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             {TOKEN_COLORS.map((color) => (
               <div
                 key={color}
@@ -99,7 +99,7 @@ export function GameBoard({
                   outline: selectedColors.includes(color as GemColor) ? "3px solid #ca8a04" : "none",
                 }}
               >
-                <TokenIcon color={color} size={44} />
+                <TokenIcon color={color} size={34} />
                 <span
                   style={{
                     position: "absolute",
@@ -108,7 +108,7 @@ export function GameBoard({
                     background: "#0f172a",
                     color: "#fff",
                     borderRadius: 8,
-                    fontSize: 11,
+                    fontSize: 10,
                     padding: "0 4px",
                   }}
                 >
@@ -116,7 +116,7 @@ export function GameBoard({
                 </span>
               </div>
             ))}
-            <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+            <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
               <button
                 className="card-action-btn"
                 disabled={!canAct || selectedColors.length !== 3}
@@ -137,21 +137,25 @@ export function GameBoard({
           </div>
         </div>
 
-        <div style={{ gridArea: "cards", display: "flex", flexDirection: "column", gap: 10, minHeight: 0, overflowY: "auto" }}>
+        <div style={{ gridArea: "cards", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
           {TIERS.map((tier) => (
-            <div key={tier} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", gap: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#e8c874" }}>
+            <div key={tier} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#e8c874" }}>
                 TIER {tier} · 덱 {state.decks[tier].length}장
               </span>
-              <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 8, alignItems: "stretch", justifyContent: "center" }}>
                 {state.visibleCards[tier].map((card, slotIndex) =>
                   card ? (
-                    <div key={card.id} style={{ flex: "1 1 0", minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
-                      <CardView card={card} variant="board" />
-                      <div style={{ display: "flex", gap: 4 }}>
+                    <div
+                      key={card.id}
+                      style={{ height: "100%", display: "flex", flexDirection: "column", gap: 2, minHeight: 0 }}
+                    >
+                      <div style={{ flex: 1, minHeight: 0 }}>
+                        <CardView card={card} variant="board" />
+                      </div>
+                      <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
                         <button
                           className="card-action-btn"
-                          style={{ flex: 1 }}
                           disabled={!canAct || !me || !canAffordCard(me, card)}
                           onClick={() => dispatch({ type: "PURCHASE_VISIBLE", tier, slotIndex })}
                         >
@@ -159,7 +163,6 @@ export function GameBoard({
                         </button>
                         <button
                           className="card-action-btn"
-                          style={{ flex: 1 }}
                           disabled={!canAct || (me?.reservedCards.length ?? 0) >= 3}
                           onClick={() => dispatch({ type: "RESERVE_VISIBLE", tier, slotIndex })}
                         >
@@ -168,14 +171,14 @@ export function GameBoard({
                       </div>
                     </div>
                   ) : (
-                    <div key={slotIndex} style={{ flex: "1 1 0", aspectRatio: "5 / 7" }} />
+                    <div key={slotIndex} style={{ height: "100%", aspectRatio: "5 / 7" }} />
                   ),
                 )}
                 <button
                   className="card-action-btn"
                   disabled={!canAct || state.decks[tier].length === 0 || (me?.reservedCards.length ?? 0) >= 3}
                   onClick={() => dispatch({ type: "RESERVE_FROM_DECK", tier })}
-                  style={{ flexShrink: 0, alignSelf: "center", minWidth: 64 }}
+                  style={{ flexShrink: 0, alignSelf: "center" }}
                 >
                   덱에서
                   <br />
