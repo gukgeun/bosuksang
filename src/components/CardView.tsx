@@ -9,10 +9,10 @@ export function CardView({ card, variant = "modal" }: { card: Card; variant?: "b
   );
 
   const isBoard = variant === "board";
-  const bonusIconSize = isBoard ? 16 : 22;
-  const costIconSize = isBoard ? 14 : 20;
-  const pointsFontSize = isBoard ? 15 : 20;
-  const costFontSize = isBoard ? 9 : 11;
+  const bonusIconSize = isBoard ? 22 : 22;
+  const costIconSize = isBoard ? 20 : 20;
+  const pointsFontSize = isBoard ? 20 : 20;
+  const costFontSize = isBoard ? 11 : 11;
 
   return (
     <div
@@ -20,8 +20,8 @@ export function CardView({ card, variant = "modal" }: { card: Card; variant?: "b
         isBoard
           ? {
               position: "relative",
-              height: "100%",
-              width: "auto",
+              width: "100%",
+              height: "auto",
               aspectRatio: "5 / 7",
               borderRadius: 8,
               overflow: "hidden",

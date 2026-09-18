@@ -79,40 +79,79 @@ export function GameBoard({
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "1fr clamp(90px, 11vw, 140px)",
+          gridTemplateColumns: "1fr clamp(90px, 10vw, 130px)",
           gridTemplateRows: "auto 1fr auto",
-          gridTemplateAreas: '"nobles tokens" "cards tokens" "players players"',
+          gridTemplateAreas: '"tokens nobles" "cards nobles" "players players"',
           gap: 8,
         }}
       >
-        <div style={{ gridArea: "nobles", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#e8c874" }}>귀족카드</span>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {state.nobles.map((noble) => (
-              <NobleView key={noble.id} noble={noble} />
+        <div style={{ gridArea: "tokens", display: "flex", flexDirection: "column", gap: 6, minHeight: 0 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#e8c874" }}>토큰</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+            {TOKEN_COLORS.map((color) => (
+              <div
+                key={color}
+                className="tap-target"
+                onClick={() => color !== "gold" && toggleColor(color)}
+                style={{
+                  position: "relative",
+                  cursor: color !== "gold" && canAct ? "pointer" : "default",
+                  outline: selectedColors.includes(color as GemColor) ? "3px solid #ca8a04" : "none",
+                }}
+              >
+                <TokenIcon color={color} size={44} />
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: -3,
+                    right: -3,
+                    background: "#0f172a",
+                    color: "#fff",
+                    borderRadius: 8,
+                    fontSize: 11,
+                    padding: "0 4px",
+                  }}
+                >
+                  {state.tokens[color]}
+                </span>
+              </div>
             ))}
+            <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+              <button
+                className="card-action-btn"
+                disabled={!canAct || selectedColors.length !== 3}
+                onClick={() =>
+                  dispatch({ type: "TAKE_THREE_DIFFERENT", colors: selectedColors as [GemColor, GemColor, GemColor] })
+                }
+              >
+                다른 색 3개
+              </button>
+              <button
+                className="card-action-btn"
+                disabled={!canAct || selectedColors.length !== 1 || state.tokens[selectedColors[0]] < 4}
+                onClick={() => dispatch({ type: "TAKE_TWO_SAME", color: selectedColors[0] })}
+              >
+                같은 색 2개
+              </button>
+            </div>
           </div>
         </div>
 
-        <div style={{ gridArea: "cards", display: "flex", flexDirection: "column", gap: 4, minHeight: 0 }}>
+        <div style={{ gridArea: "cards", display: "flex", flexDirection: "column", gap: 10, minHeight: 0, overflowY: "auto" }}>
           {TIERS.map((tier) => (
-            <div key={tier} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+            <div key={tier} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", gap: 4 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#e8c874" }}>
                 TIER {tier} · 덱 {state.decks[tier].length}장
               </span>
-              <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 6, alignItems: "stretch" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 {state.visibleCards[tier].map((card, slotIndex) =>
                   card ? (
-                    <div
-                      key={card.id}
-                      style={{ height: "100%", display: "flex", flexDirection: "column", gap: 2, minHeight: 0 }}
-                    >
-                      <div style={{ flex: 1, minHeight: 0 }}>
-                        <CardView card={card} variant="board" />
-                      </div>
-                      <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
+                    <div key={card.id} style={{ flex: "1 1 0", minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                      <CardView card={card} variant="board" />
+                      <div style={{ display: "flex", gap: 4 }}>
                         <button
                           className="card-action-btn"
+                          style={{ flex: 1 }}
                           disabled={!canAct || !me || !canAffordCard(me, card)}
                           onClick={() => dispatch({ type: "PURCHASE_VISIBLE", tier, slotIndex })}
                         >
@@ -120,6 +159,7 @@ export function GameBoard({
                         </button>
                         <button
                           className="card-action-btn"
+                          style={{ flex: 1 }}
                           disabled={!canAct || (me?.reservedCards.length ?? 0) >= 3}
                           onClick={() => dispatch({ type: "RESERVE_VISIBLE", tier, slotIndex })}
                         >
@@ -128,14 +168,14 @@ export function GameBoard({
                       </div>
                     </div>
                   ) : (
-                    <div key={slotIndex} style={{ height: "100%", aspectRatio: "5 / 7" }} />
+                    <div key={slotIndex} style={{ flex: "1 1 0", aspectRatio: "5 / 7" }} />
                   ),
                 )}
                 <button
                   className="card-action-btn"
                   disabled={!canAct || state.decks[tier].length === 0 || (me?.reservedCards.length ?? 0) >= 3}
                   onClick={() => dispatch({ type: "RESERVE_FROM_DECK", tier })}
-                  style={{ flexShrink: 0, alignSelf: "center" }}
+                  style={{ flexShrink: 0, alignSelf: "center", minWidth: 64 }}
                 >
                   덱에서
                   <br />
@@ -148,7 +188,7 @@ export function GameBoard({
 
         <div
           style={{
-            gridArea: "tokens",
+            gridArea: "nobles",
             display: "flex",
             flexDirection: "column",
             gap: 6,
@@ -156,54 +196,11 @@ export function GameBoard({
             alignItems: "center",
           }}
         >
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#e8c874" }}>토큰</span>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1, justifyContent: "center" }}>
-            {TOKEN_COLORS.map((color) => (
-              <div
-                key={color}
-                className="tap-target"
-                onClick={() => color !== "gold" && toggleColor(color)}
-                style={{
-                  position: "relative",
-                  cursor: color !== "gold" && canAct ? "pointer" : "default",
-                  outline: selectedColors.includes(color as GemColor) ? "3px solid #ca8a04" : "none",
-                }}
-              >
-                <TokenIcon color={color} size={36} />
-                <span
-                  style={{
-                    position: "absolute",
-                    bottom: -3,
-                    right: -3,
-                    background: "#0f172a",
-                    color: "#fff",
-                    borderRadius: 8,
-                    fontSize: 10,
-                    padding: "0 4px",
-                  }}
-                >
-                  {state.tokens[color]}
-                </span>
-              </div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#e8c874" }}>귀족카드</span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, overflowY: "auto", alignItems: "center" }}>
+            {state.nobles.map((noble) => (
+              <NobleView key={noble.id} noble={noble} />
             ))}
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4, width: "100%" }}>
-            <button
-              className="card-action-btn"
-              disabled={!canAct || selectedColors.length !== 3}
-              onClick={() =>
-                dispatch({ type: "TAKE_THREE_DIFFERENT", colors: selectedColors as [GemColor, GemColor, GemColor] })
-              }
-            >
-              다른 색 3개
-            </button>
-            <button
-              className="card-action-btn"
-              disabled={!canAct || selectedColors.length !== 1 || state.tokens[selectedColors[0]] < 4}
-              onClick={() => dispatch({ type: "TAKE_TWO_SAME", color: selectedColors[0] })}
-            >
-              같은 색 2개
-            </button>
           </div>
         </div>
 

@@ -88,8 +88,23 @@ button:disabled {
 button.card-action-btn {
   min-height: 38px;
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: clamp(12px, 1.15vw, 16px);
   border-radius: 8px;
+  background: linear-gradient(180deg, #f8eeda 0%, #e6cf9f 100%);
+  color: #4a2c14;
+  border: 1px solid #b8823f;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+button.card-action-btn:active:not(:disabled) {
+  background: linear-gradient(180deg, #e6cf9f 0%, #d6b878 100%);
+}
+
+button.card-action-btn:disabled {
+  background: #a89a86;
+  color: #5c5245;
+  border-color: #8a7c68;
 }
 
 button.stepper-btn {
@@ -150,13 +165,26 @@ button.stepper-btn {
 
 .playmat {
   position: relative;
-  background-color: #0c0c0d;
-  background-image: url("/assets/playmat.png");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+  background-color: #7a4f2d;
+  background-image:
+    repeating-linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0.04) 0px,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    repeating-linear-gradient(
+      100deg,
+      rgba(0, 0, 0, 0.06) 0px,
+      rgba(0, 0, 0, 0.06) 2px,
+      transparent 2px,
+      transparent 60px
+    ),
+    linear-gradient(120deg, #8c5a34 0%, #7a4d2b 35%, #6b4023 65%, #5c3620 100%);
   border-radius: 18px;
   box-shadow:
-    inset 0 0 50px rgba(0, 0, 0, 0.65),
+    inset 0 0 60px rgba(0, 0, 0, 0.4),
     0 10px 28px rgba(0, 0, 0, 0.55);
   padding: clamp(8px, 1.6vw, 22px);
 }
